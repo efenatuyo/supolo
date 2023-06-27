@@ -6,7 +6,7 @@ import time
 class supolo:
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     
-    def __init__(self, tokenType, token, skipOnRatelimit=True, ratelimitCooldown=1):
+    def __init__(self, tokenType, token, skipOnRatelimit=False, ratelimitCooldown=1):
         self.url = "https://discord.com/api/v10"
         self.skipOnRatelimit = skipOnRatelimit
         self.ratelimitCooldown = ratelimitCooldown
@@ -80,7 +80,7 @@ class supolo:
                 end_time = time.perf_counter() - start_time
                 return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits + guilds_data["total_ratelimits"], "users": shared_users}
                     
-    async def get_guilds_member(self, guild_ids: list):
+    async def get_guilds_members(self, guild_ids: list):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
         logging.debug(f'Started fetching users in guilds {" ".join(str(guild_id) for guild_id in guild_ids)}')
@@ -150,7 +150,7 @@ class supolo:
                                       user_id=user['id'], unbanned_users=unbanned_users,
                                       total_ratelimit=total_ratelimit, timeout=timeout, guild_id=guild))
             await asyncio.gather(*unban_tasks)
-        return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit, 'unbanned_users': unbanned_users}
+        return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit[0], 'unbanned_users': unbanned_users}
         
         
     async def single_unban(self, session, url, user_id, unbanned_users, total_ratelimit, timeout, guild_id):
@@ -171,7 +171,43 @@ class supolo:
                         return False
             except:
                 return False
-                
+
+    async def mass_kick(self, guild_ids: list, timeout=5):
+        start_time = time.perf_counter()
+        assert isinstance(guild_ids, list), "guild_ids has to be a list"
+        logging.debug(f'Started mass kicking users in guilds {" ".join(str(guild_id) for guild_id in guild_ids)}')
+        guilds = (await self.get_guilds_members(guild_ids))['users']
+        kick_tasks = []
+        total_ratelimit = [0]
+        kicked_users = {}
+        async with aiohttp.ClientSession(headers = {'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            for user in guilds:
+                for guild_id in guilds[user]["shared_guilds"]:
+                    if str(guild_id) not in kicked_users:
+                        kicked_users[str(guild_id)] = []
+                    kick_tasks.append(self.single_kick(session, f"{self.url}/guilds/{guild_id}/members/{user}", user, kicked_users, total_ratelimit, timeout, guild_id))
+            await asyncio.gather(*kick_tasks)
+            return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit[0], 'kicked_users': kicked_users}
+
+
+    async def single_kick(self, session, url, user_id, kicked_users, total_ratelimit, timeout, guild_id):
+        while True:
+            try:
+                async with session.delete(url, timeout=aiohttp.ClientTimeout(total=timeout)) as response:
+                    if response.status == 204:
+                        kicked_users[str(guild_id)].append(user_id)
+                        return True
+                    elif response.status == 429:
+                        total_ratelimit[0] += 1
+                        if not self.skipOnRatelimit:
+                            await asyncio.sleep(self.ratelimitCooldown)
+                        else:
+                            return False
+                    else:
+                        return False
+            except:
+                return False
+
     async def get_guilds_banned_users(self, guild_ids: list):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
@@ -221,7 +257,7 @@ class supolo:
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
         logging.debug(f'Starting mass ban on guild_ids: {" ".join(str(guild_id) for guild_id in guild_ids)}')
-        users = (await self.get_guilds_member(guild_ids))['users']
+        users = (await self.get_guilds_members(guild_ids))['users']
         async with aiohttp.ClientSession(headers={'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
             ban_tasks = []
             banned_users = {}
