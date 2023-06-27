@@ -9,4 +9,4 @@ example of response
 `
 
 ### important
-I suggest to leave `skipOnRatelimit` false on bigger tasks like mass kick, mass ban etc due to these endpoints ratelimiting fast but for a short time. You can modify ratelimitCooldown in seconds (can also be 0 not suggested)
+I suggest to leave `skipOnRatelimit` false on bigger tasks like mass kick, mass ban etc due to these endpoints ratelimiting fast but for a short time. You can modify `ratelimitCooldown` in seconds (can also be 0 not suggested)
