@@ -29,3 +29,7 @@ print(users)
 # mass unban
 unbanned_user = asyncio.run(x.mass_unban(guild_ids=[1121185995354804314]))
 print(unbanned_user)
+
+# mass kick
+kicked_members = asyncio.run(x.mass_kick(guild_ids=[1121185995354804314]))
+print(kicked_members)
