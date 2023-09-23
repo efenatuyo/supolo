@@ -33,3 +33,12 @@ print(unbanned_user)
 # mass kick
 kicked_members = asyncio.run(x.mass_kick(guild_ids=[1121185995354804314]))
 print(kicked_members)
+
+# get guilds channels
+guilds_channels = asyncio.run(x.get_guilds_channels(guild_ids=[1038575674899841044]))
+print(guilds_channels)
+
+# get guild channels
+# need to create aiohttp session
+guild_channels = asyncio.run(x.get_guild_channels(session, guild_id=1038575674899841044))
+print(guild_channels)
