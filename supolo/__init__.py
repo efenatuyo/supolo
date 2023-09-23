@@ -79,7 +79,40 @@ class supolo:
                     
                 end_time = time.perf_counter() - start_time
                 return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits + guilds_data["total_ratelimits"], "users": shared_users}
-                    
+
+    async def get_guilds_channels(self, guild_ids):
+        start_time = time.perf_counter()
+        assert isinstance(guild_ids, list), "Guild IDs should be a list"
+        shared_channels = {}
+        total_ratelimits = 0
+        async with aiohttp.ClientSession(headers = {'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = [self.get_guild_channels(session, guild_id, shared_channels, total_ratelimits) for guild_id in guild_ids]
+            await asyncio.gather(*tasks)
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "channels": shared_channels}
+        
+    async def get_guild_channels(self, session, guild_id, shared_channels=None, total_ratelimits=None):
+        logging.debug(f'Started fetching users in guild: {guild_id}')
+        if shared_channels is None:
+            shared_channels = {}
+        if not total_ratelimits:
+            total_ratelimits = 0
+        
+        while True:   
+         async with session.get(f"{self.url}/guilds/{guild_id}/channels") as response:
+            if response.status == 200:
+                data = await response.json()
+                shared_channels[guild_id] = data
+                break
+            elif response.status == 429:
+                total_ratelimits += 1
+                if not self.skipOnRatelimit:
+                    await asyncio.sleep(self.ratelimitCooldown)
+                else:
+                    break
+
+        return shared_channels
+                     
     async def get_guilds_members(self, guild_ids: list):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
@@ -94,7 +127,7 @@ class supolo:
             await asyncio.gather(*guild_tasks)
             
             return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimits, 'users': shared_users}
-        
+
     async def get_guild_members(self, session=None, url=None, shared_users=None, guild_id=None, total_ratelimits=0, method=None):
         assert guild_id, "Required guild_id value"
         assert method, "Reqired method value, Types: ['get_shared_user_ids', 'get_guild_members']"
