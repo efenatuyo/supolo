@@ -44,10 +44,10 @@ guild_channels = asyncio.run(x.get_guild_channels(session, guild_id=103857567489
 print(guild_channels)
 
 # delete guilds channels
-deleted_channels = asyncio.run(x.delete_guilds_channels(channel_ids=sorted_channels))
+deleted_channels = asyncio.run(x.delete_guilds_channels(channel_ids=[1, 2]))
 print(deleted_channels)
 
 # delete guild channel
 # need to create aiohttp session
-deleted_channel = asyncio.run(x.delete_guild_channel(session, channel_id))
+deleted_channel = asyncio.run(x.delete_guild_channel(session, channel_id=1))
 print(deleted_channel)
