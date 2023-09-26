@@ -51,3 +51,12 @@ print(deleted_channels)
 # need to create aiohttp session
 deleted_channel = asyncio.run(x.delete_guild_channel(session, channel_id=1))
 print(deleted_channel)
+
+# create guilds channels
+created_channels = asyncio.run(x.create_guilds_channels(guild_ids=[1141399067142926386], data={"name": "b", "type": 0}, amount=100))
+print(created_channels)
+
+# create guild channel
+# need to create aiohttp session
+created_channel = asyncio.run(x.create_guild_channel(session, guild_id=1141399067142926386, data={"name": "b", "type": 0}))
+print(created_channel)
