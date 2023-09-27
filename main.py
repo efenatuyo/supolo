@@ -60,3 +60,17 @@ print(created_channels)
 # need to create aiohttp session
 created_channel = asyncio.run(x.create_guild_channel(session, guild_id=1141399067142926386, data={"name": "b", "type": 0}))
 print(created_channel)
+
+# spam guilds channels
+spammed_channels = asyncio.run(x.spam_guilds_channels(channel_ids=[1156359267503308864], data_message={"content": "@everyone"}, data_webhook={"name": "cool"}, amount=20, method="bot or webhook"))
+print(spammed_channels)
+
+# spam guild channel
+# need to create aiohttp session
+spammed_channel = asyncio.run(x.spam_guilds_channels(session, channel_id=1156359267503308864, data_message={"content": "@everyone"}, data_webhook={"name": "cool"}, amount=20, method="bot or webhook"))
+print(spammed_channel)
+
+# create channel webhook
+# need to create aiohttp session
+webhook = asyncio.run(x.create_channel_webhook(session, channel_id=1156359267503308864, data_webhook={"name": "cool"}))
+print(webhook)
