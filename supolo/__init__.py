@@ -376,4 +376,60 @@ class supolo:
             await asyncio.gather(*tasks)
         end_time = time.perf_counter() - start_time
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_channels": created_channels} 
-            
+    
+    async def spam_guilds_channels(self, channel_ids, amount=10, data_message={}, data_webhook={"name": ":)"}, method="bot"):
+        """
+        method = ["bot", "webhook"]
+        """
+        start_time = time.perf_counter()
+        assert method in ["bot", "webhook"], "Method has to be in ['bot', 'webhook']"
+        assert isinstance(channel_ids, list), "Channel ids has to be a list"
+        spammed_channels = []
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers = {'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = [self.spam_guild_channel(session, channel_id, amount, data_message, method, data_webhook, spammed_channels, total_ratelimits) for channel_id in channel_ids]
+            await asyncio.gather(*tasks)
+        
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "spammed_channels": spammed_channels}
+
+    async def spam_guild_channel(self, session, channel_id, amount, data_message, method="bot", data_webhook={}, spammed_channels=[], total_ratelimits=0):
+        logging.debug(f'Started spamming channel ID: {channel_id}')
+        url = f"{self.url}/channels/{channel_id}/messages"
+        if method == "webhook":
+            webhook = await self.create_channel_webhook(session, channel_id, data_webhook)
+            if webhook.get("token") and webhook.get("id"):
+                url = f"{self.url}/webhooks/{webhook.get('id')}/{webhook.get('token')}"
+        
+        for i in range(amount):
+         while True:   
+          async with session.post(url, json=data_message) as response:
+            if response.status in [201, 200, 204]:
+                if not channel_id in spammed_channels:
+                    spammed_channels.append(channel_id)
+                break
+            elif response.status == 429:
+                total_ratelimits += 1
+                if not self.skipOnRatelimit:
+                    await asyncio.sleep(self.ratelimitCooldown)
+                else:
+                    break
+            else:
+                break
+        return spammed_channels
+    
+    async def create_channel_webhook(self, session, channel_id, data_webhook):
+        logging.debug(f'Started creating webhook in channel ID: {channel_id}')
+        while True:   
+         async with session.post(f"{self.url}/channels/{channel_id}/webhooks", json=data_webhook) as response:
+            if response.status in [201, 200, 204]:
+                return await response.json()
+            elif response.status == 429:
+                total_ratelimits += 1
+                if not self.skipOnRatelimit:
+                    await asyncio.sleep(self.ratelimitCooldown)
+                else:
+                    break
+            else:
+                break
+        return {}
