@@ -83,3 +83,7 @@ print(created_roles)
 # need to create aiohttp session
 created_role = asyncio.run(x.create_guild_role(session, guild_id=1141399067142926386, data_role={"name": "ok"}))
 print(created_role)
+
+# get guilds roles
+guilds_roles = asyncio.run(x.get_guilds_roles(guild_ids=[1141399067142926386]))
+print(guilds_roles)
