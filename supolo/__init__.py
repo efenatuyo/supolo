@@ -377,7 +377,7 @@ class supolo:
         end_time = time.perf_counter() - start_time
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_channels": created_channels} 
     
-    async def spam_guilds_channels(self, channel_ids, amount=10, data_message={}, data_webhook={"name": ":)"}, method="bot"):
+    async def spam_guilds_channels(self, channel_ids, amount=10, data_message={"content": "@everyone"}, data_webhook={"name": ":)"}, method="bot"):
         """
         method = ["bot", "webhook"]
         """
@@ -433,3 +433,37 @@ class supolo:
             else:
                 break
         return {}
+    
+    async def spam_guilds_roles(self, guild_ids, data_role={}, amount=10):
+        start_time = time.perf_counter()
+        assert isinstance(guild_ids, list), "guild_ids has to be a list"
+        created_roles = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers = {'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in guild_ids:
+                for i in range(amount):
+                    tasks.append(self.create_guild_role(session, guild_id, data_role, created_roles, total_ratelimits))
+            await asyncio.gather(*tasks)
+        
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_roles": created_roles}
+    
+    async def create_guild_role(self, session, guild_id, data_role, created_roles={}, total_ratelimits=0):
+        logging.debug(f'Started creating role in guild ID: {guild_id}')
+        while True:   
+         async with session.post(f"{self.url}/guilds/{guild_id}/roles", json=data_role) as response:
+            if response.status in [201, 200, 204]:
+                if not str(guild_id) in created_roles:
+                    created_roles[str(guild_id)] = []
+                created_roles[str(guild_id)].append(await response.json())
+                break
+            elif response.status == 429:
+                total_ratelimits += 1
+                if not self.skipOnRatelimit:
+                    await asyncio.sleep(self.ratelimitCooldown)
+                else:
+                    break
+            else:
+                break
+        return created_roles
