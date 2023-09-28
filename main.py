@@ -75,8 +75,8 @@ print(spammed_channel)
 webhook = asyncio.run(x.create_channel_webhook(session, channel_id=1156359267503308864, data_webhook={"name": "cool"}))
 print(webhook)
 
-# spam guilds roles
-spammed_roles = asyncio.run(x.spam_guilds_roles(guild_ids=[1141399067142926386], data_role={"name": "test"}, amount=1))
+# create guilds roles
+created_roles = asyncio.run(x.create_guilds_roles(guild_ids=[1141399067142926386], data_role={"name": "test"}, amount=100))
 print(spammed_roles)
 
 # create guild role
