@@ -87,3 +87,17 @@ print(created_role)
 # get guilds roles
 guilds_roles = asyncio.run(x.get_guilds_roles(guild_ids=[1141399067142926386]))
 print(guilds_roles)
+
+# get guild roles
+# need to create aiohttp session
+guild_roles = asyncio.run(x.get_guild_roles(session, guild_id=1141399067142926386))
+print(guild_roles)
+
+# delete guilds roles
+deleted_roles = asyncio.run(x.delete_guilds_roles(role_ids={"server_id": ["role_id"]}))
+print(deleted_roles)
+
+# delete guild role
+# need aiohttp session
+deleted_role = asyncio.run(x.delete_guild_role(session, guild_id=1141399067142926386, role_id=1156919420862611506))
+print(deleted_role)
