@@ -434,7 +434,7 @@ class supolo:
                 break
         return {}
     
-    async def spam_guilds_roles(self, guild_ids, data_role={}, amount=10):
+    async def create_guilds_roles(self, guild_ids, data_role={}, amount=10):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
         created_roles = {}
