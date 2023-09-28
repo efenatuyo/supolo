@@ -77,7 +77,7 @@ print(webhook)
 
 # create guilds roles
 created_roles = asyncio.run(x.create_guilds_roles(guild_ids=[1141399067142926386], data_role={"name": "test"}, amount=100))
-print(spammed_roles)
+print(created_roles)
 
 # create guild role
 # need to create aiohttp session
