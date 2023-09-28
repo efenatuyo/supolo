@@ -485,16 +485,47 @@ class supolo:
         while True:   
             async with session.get(f"{self.url}/guilds/{guild_id}/roles") as response:
                 if response.status == 200:
-                    print(await response.json())
                     guilds_roles[str(guild_id)] = await response.json()
                     break
                 elif response.status == 429:
                     total_ratelimits += 1
-                    if not self.skip_on_ratelimit:
-                        await asyncio.sleep(self.ratelimit_cooldown)
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
                     else:
                         break
                 else:
                     break
         return guilds_roles
     
+    async def delete_guilds_roles(self, role_ids):
+        start_time = time.perf_counter()
+        assert isinstance(role_ids, dict), "Role IDs must be a dictionary"
+        deleted_roles = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in role_ids:
+                for role_id in role_ids[guild_id]:
+                    tasks.append(self.delete_guild_role(session, guild_id, role_id, deleted_roles, total_ratelimits))
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_roles": deleted_roles}
+    
+    async def delete_guild_role(self, session, guild_id, role_id, deleted_roles={}, total_ratelimits=0):
+        logging.debug(f'Started deleting role ID: {role_id}, in guild ID: {guild_id}')
+        while True:   
+            async with session.delete(f"{self.url}/guilds/{guild_id}/roles/{role_id}") as response:
+                if response.status == 200:
+                    if not str(guild_id) in deleted_roles:
+                        deleted_roles[str(guild_id)] = []
+                    deleted_roles[str(guild_id)].append(role_id)
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return deleted_roles
