@@ -467,3 +467,34 @@ class supolo:
             else:
                 break
         return created_roles
+    
+    async def get_guilds_roles(self, guild_ids):
+        start_time = time.perf_counter()
+        assert isinstance(guild_ids, list), "guild_ids has to be a list"
+        guilds_roles = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = [self.get_guild_roles(session, guild_id, guilds_roles, total_ratelimits) for guild_id in guild_ids]
+            await asyncio.gather(*tasks)
+        
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "guilds_roles": guilds_roles}
+    
+    async def get_guild_roles(self, session, guild_id, guilds_roles={}, total_ratelimits=0):
+        logging.debug(f'Started scraping roles in guild ID: {guild_id}')
+        while True:   
+            async with session.get(f"{self.url}/guilds/{guild_id}/roles") as response:
+                if response.status == 200:
+                    print(await response.json())
+                    guilds_roles[str(guild_id)] = await response.json()
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skip_on_ratelimit:
+                        await asyncio.sleep(self.ratelimit_cooldown)
+                    else:
+                        break
+                else:
+                    break
+        return guilds_roles
+    
