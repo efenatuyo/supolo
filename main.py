@@ -101,3 +101,13 @@ print(deleted_roles)
 # need aiohttp session
 deleted_role = asyncio.run(x.delete_guild_role(session, guild_id=1141399067142926386, role_id=1156919420862611506))
 print(deleted_role)
+
+# modify guilds users
+# see json at https://discord.com/developers/docs/resources/guild#modify-guild-member 
+modified_users = asyncio.run(x.mass_modify_guilds_users(user_ids={"guild_id": ["user_ids"]}))
+print(modified_users)
+
+# modify guild user
+# need aiohttp session
+modified_user = asyncio.run(x.modify_guild_user(session, guild_id=1141399067142926386, user_id=1136830212009644103, data_modify={}))
+print(modified_user)
