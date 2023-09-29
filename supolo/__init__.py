@@ -591,18 +591,18 @@ class supolo:
                     break
         return modified_guilds
 
-    async def mass_create_guilds_emojis(self, guild_ids: list, data_create: dict, amount: int =1): # https://discord.com/developers/docs/resources/emoji#create-guild-emoji
+    async def mass_create_guilds_emojis(self, guild_ids: list, data_create: dict, amount: int =10): # https://discord.com/developers/docs/resources/emoji#create-guild-emoji
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids IDs must be a list"
         created_emojis = {}
         total_ratelimits = 0       
         async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
-            tasks = [self.modify_guild(session, guild_id, data_create, created_emojis, total_ratelimits) for i in range(amount) for guild_id in guild_ids]
+            tasks = [self.create_guild_emoji(session, guild_id, data_create, created_emojis, total_ratelimits) for i in range(amount) for guild_id in guild_ids]
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_emojis": created_emojis}
     
-    async def create_guild_emojix(self, session, guild_id, data_create, created_emojis={}, total_ratelimits=0):
+    async def create_guild_emoji(self, session, guild_id, data_create, created_emojis={}, total_ratelimits=0):
         logging.debug(f'Started creating emoji in guild ID: {guild_id}')
         while True:   
             async with session.post(f"{self.url}/guilds/{guild_id}/emojis", json=data_create) as response:
