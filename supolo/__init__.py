@@ -80,7 +80,7 @@ class supolo:
                 end_time = time.perf_counter() - start_time
                 return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits + guilds_data["total_ratelimits"], "users": shared_users}
 
-    async def get_guilds_channels(self, guild_ids):
+    async def get_guilds_channels(self, guild_ids: list):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "Guild IDs should be a list"
         shared_channels = {}
@@ -126,7 +126,7 @@ class supolo:
                 break
         return deleted_channels
         
-    async def delete_guilds_channels(self, channel_ids):
+    async def delete_guilds_channels(self, channel_ids: list):
         start_time = time.perf_counter()
         assert isinstance(channel_ids, list), "channel_ids IDs should be a list"
         total_ratelimits = 0
@@ -308,7 +308,7 @@ class supolo:
                         break
         return {"success": True, 'time_taken': time.perf_counter() - start_time, 'total_ratelimits': total_ratelimits, "users": banned_users[str(guild_id)]}
     
-    async def mass_ban(self, guild_ids, timeout=5):
+    async def mass_ban(self, guild_ids: list, timeout: int =5):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
         logging.debug(f'Starting mass ban on guild_ids: {" ".join(str(guild_id) for guild_id in guild_ids)}')
@@ -362,7 +362,7 @@ class supolo:
                 break
         return created_channels
     
-    async def create_guilds_channels(self, guild_ids, data, amount):
+    async def create_guilds_channels(self, guild_ids: list, data: dict, amount: int =10):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids IDs should be a list"
         total_ratelimits = 0
@@ -377,7 +377,7 @@ class supolo:
         end_time = time.perf_counter() - start_time
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_channels": created_channels} 
     
-    async def spam_guilds_channels(self, channel_ids, amount=10, data_message={"content": "@everyone"}, data_webhook={"name": ":)"}, method="bot"):
+    async def spam_guilds_channels(self, channel_ids: list, amount: int =10, data_message: dict ={"content": "@everyone"}, data_webhook: dict ={"name": ":)"}, method: str ="bot"):
         """
         method = ["bot", "webhook"]
         """
@@ -434,7 +434,7 @@ class supolo:
                 break
         return {}
     
-    async def create_guilds_roles(self, guild_ids, data_role={}, amount=10):
+    async def create_guilds_roles(self, guild_ids: list, data_role: dict = {}, amount: int =10):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
         created_roles = {}
@@ -468,7 +468,7 @@ class supolo:
                 break
         return created_roles
     
-    async def get_guilds_roles(self, guild_ids):
+    async def get_guilds_roles(self, guild_ids: list):
         start_time = time.perf_counter()
         assert isinstance(guild_ids, list), "guild_ids has to be a list"
         guilds_roles = {}
@@ -484,7 +484,7 @@ class supolo:
         logging.debug(f'Started scraping roles in guild ID: {guild_id}')
         while True:   
             async with session.get(f"{self.url}/guilds/{guild_id}/roles") as response:
-                if response.status == 200:
+                if response.status in [201, 200, 204]:
                     guilds_roles[str(guild_id)] = await response.json()
                     break
                 elif response.status == 429:
@@ -497,7 +497,7 @@ class supolo:
                     break
         return guilds_roles
     
-    async def delete_guilds_roles(self, role_ids):
+    async def delete_guilds_roles(self, role_ids: dict):
         start_time = time.perf_counter()
         assert isinstance(role_ids, dict), "Role IDs must be a dictionary"
         deleted_roles = {}
@@ -515,7 +515,7 @@ class supolo:
         logging.debug(f'Started deleting role ID: {role_id}, in guild ID: {guild_id}')
         while True:   
             async with session.delete(f"{self.url}/guilds/{guild_id}/roles/{role_id}") as response:
-                if response.status == 200:
+                if response.status in [201, 200, 204]:
                     if not str(guild_id) in deleted_roles:
                         deleted_roles[str(guild_id)] = []
                     deleted_roles[str(guild_id)].append(role_id)
@@ -530,7 +530,7 @@ class supolo:
                     break
         return deleted_roles
     
-    async def mass_modify_guilds_users(self, user_ids, data_modify: dict): # https://discord.com/developers/docs/resources/guild#modify-guild-member
+    async def mass_modify_guilds_users(self, user_ids: dict, data_modify: dict): # https://discord.com/developers/docs/resources/guild#modify-guild-member
         start_time = time.perf_counter()
         assert isinstance(user_ids, dict), "user_ids IDs must be a dictionary"
         modified_users = {}
@@ -548,7 +548,7 @@ class supolo:
         logging.debug(f'Started modifying user ID: {user_id}, in guild ID: {guild_id}')
         while True:   
             async with session.patch(f"{self.url}/guilds/{guild_id}/members/{user_id}", json=data_modify) as response:
-                if response.status == 200:
+                if response.status in [201, 200, 204]:
                     if not str(guild_id) in modified_users:
                         modified_users[str(guild_id)] = []
                     modified_users[str(guild_id)].append(user_id)
@@ -563,3 +563,30 @@ class supolo:
                     break
         return modified_users
     
+    async def mass_modify_guilds(self, guild_ids: list, data_modify: dict): # https://discord.com/developers/docs/resources/guild#modify-guild
+        start_time = time.perf_counter()
+        assert isinstance(guild_ids, list), "guild_ids IDs must be a list"
+        modified_guilds = []
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = [self.modify_guild(session, guild_id, data_modify, modified_guilds, total_ratelimits) for guild_id in guild_ids]
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_guilds": modified_guilds}
+    
+    async def modify_guild(self, session, guild_id, data_modify, modified_guilds={}, total_ratelimits=0):
+        logging.debug(f'Started modifying guild ID: {guild_id}')
+        while True:   
+            async with session.patch(f"{self.url}/guilds/{guild_id}", json=data_modify) as response:
+                if response.status in [201, 200, 204]:
+                    modified_guilds.append(guild_id)
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return modified_guilds
