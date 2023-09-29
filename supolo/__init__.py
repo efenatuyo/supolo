@@ -529,3 +529,37 @@ class supolo:
                 else:
                     break
         return deleted_roles
+    
+    async def mass_modify_guilds_users(self, user_ids, data_modify: dict): # https://discord.com/developers/docs/resources/guild#modify-guild-member
+        start_time = time.perf_counter()
+        assert isinstance(user_ids, dict), "user_ids IDs must be a dictionary"
+        modified_users = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in user_ids:
+                for user_id in user_ids[guild_id]:
+                    tasks.append(self.delete_guild_role(session, guild_id, user_id, data_modify, modified_users, total_ratelimits))
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_users": modified_users}
+    
+    async def modify_guild_user(self, session, guild_id, user_id, data_modify, modified_users={}, total_ratelimits=0):
+        logging.debug(f'Started modifying user ID: {user_id}, in guild ID: {guild_id}')
+        while True:   
+            async with session.patch(f"{self.url}/guilds/{guild_id}/members/{user_id}", json=data_modify) as response:
+                if response.status == 200:
+                    if not str(guild_id) in modified_users:
+                        modified_users[str(guild_id)] = []
+                    modified_users[str(guild_id)].append(user_id)
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return modified_users
+    
