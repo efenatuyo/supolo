@@ -111,3 +111,13 @@ print(modified_users)
 # need aiohttp session
 modified_user = asyncio.run(x.modify_guild_user(session, guild_id=1141399067142926386, user_id=1136830212009644103, data_modify={}))
 print(modified_user)
+
+# modify guilds
+# see json at https://discord.com/developers/docs/resources/guild#modify-guild
+modified_guilds = asyncio.run(x.mass_modify_guilds(guild_ids=[1141399067142926386], data_modify={"name": "test"}))
+print(modified_guilds)
+
+# modify guild
+# need aiohttp session 
+modified_guild = asyncio.run(x.modify_guild(session, guild_id=1141399067142926386, data_modify={}))
+print(modified_guild)
