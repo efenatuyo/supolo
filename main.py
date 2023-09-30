@@ -141,3 +141,30 @@ print(modified_emojis)
 # need aiohttp session
 modified_emoji = asyncio.run(x.modify_guild_emoji(session, guild_id=1141399067142926386, emoji_id=1129929174090514552, data_modify={}))
 print(modified_emoji)
+
+# mass delete guilds emojis
+deleted_emojis = asyncio.run(x.mass_delete_guilds_emojis(emoji_ids={"guild_id": ["emoji_id"]}))
+print(deleted_emojis)
+
+# delete guild emoji
+# need aiohttp session
+deleted_emoji = asyncio.run(x.delete_guild_emoji(session, guild_id=1141399067142926386, emoji_id=1129929174090514552))
+print(deleted_emoji)
+
+# mass add guilds members roles
+added_member_roles = asyncio.run(x.mass_add_guilds_members_rolesles(user_ids={"guild_ids": {"user_ids": ["user_id"], "role_ids": ["role_id"]}}))
+print(added_member_roles)
+
+# add guild member role
+# need aiohttp session
+added_member_role = asyncio.run(x.add_guild_member_role(session, guild_id=123, user_id=123, role_id=123))
+print(added_member_role)
+
+# mass remove guilds members roles
+added_member_roles = asyncio.run(x.mass_remove_guilds_members_rolesles(user_ids={"guild_ids": {"user_ids": ["user_id"], "role_ids": ["role_id"]}}))
+print(added_member_roles)
+
+# remove guild member role
+# need aiohttp session
+added_member_role = asyncio.run(x.remove_guild_member_role(session, guild_id=123, user_id=123, role_id=123))
+print(added_member_role)
