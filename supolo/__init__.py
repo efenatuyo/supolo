@@ -620,3 +620,36 @@ class supolo:
                 else:
                     break
         return created_emojis
+    
+    async def mass_modify_guilds_emojis(self, emoji_ids: dict, data_modify: dict): # https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
+        start_time = time.perf_counter()
+        assert isinstance(emoji_ids, dict), "emoji_ids IDs must be a list"
+        modified_emojis = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in emoji_ids:
+                for emoji_id in emoji_ids[guild_id]:
+                    tasks.append(self.modify_guild_emoji(session, guild_id, emoji_id, data_modify, modified_emojis, total_ratelimits))
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_emojis": modified_emojis}
+    
+    async def modify_guild_emoji(self, session, guild_id, emoji_id, data_modify, modified_emojis={}, total_ratelimits=0):
+        logging.debug(f'Started modifying emoji ID: {emoji_id}, in guild ID: {guild_id}')
+        while True:   
+            async with session.patch(f"{self.url}/guilds/{guild_id}/emojis/{emoji_id}", json=data_modify) as response:
+                if response.status in [201, 200, 204]:
+                    if not str(modified_emojis) in modified_emojis:
+                        modified_emojis[str(guild_id)] = []
+                    modified_emojis[str(guild_id)].append(await response.json())
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return modified_emojis
