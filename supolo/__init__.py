@@ -539,7 +539,7 @@ class supolo:
             tasks = []
             for guild_id in user_ids:
                 for user_id in user_ids[guild_id]:
-                    tasks.append(self.delete_guild_role(session, guild_id, user_id, data_modify, modified_users, total_ratelimits))
+                    tasks.append(self.modify_guild_user(session, guild_id, user_id, data_modify, modified_users, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_users": modified_users}
@@ -653,3 +653,104 @@ class supolo:
                 else:
                     break
         return modified_emojis
+
+    async def mass_delete_guilds_emojis(self, emoji_ids: dict):
+        start_time = time.perf_counter()
+        assert isinstance(emoji_ids, dict), "emoji_ids IDs must be a list"
+        deleted_emojis = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in emoji_ids:
+                for emoji_id in emoji_ids[guild_id]:
+                    tasks.append(self.delete_guild_emoji(session, guild_id, emoji_id, deleted_emojis, total_ratelimits))
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_emojis": deleted_emojis}
+    
+    async def delete_guild_emoji(self, session, guild_id, emoji_id, deleted_emojis={}, total_ratelimits=0):
+        logging.debug(f'Started deleting emoji ID: {emoji_id}, in guild ID: {guild_id}')
+        while True:   
+            async with session.delete(f"{self.url}/guilds/{guild_id}/emojis/{emoji_id}") as response:
+                if response.status in [201, 200, 204]:
+                    if not str(deleted_emojis) in deleted_emojis:
+                        deleted_emojis[str(guild_id)] = []
+                    deleted_emojis[str(guild_id)].append(emoji_id)
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return deleted_emojis
+
+    async def mass_add_guilds_members_roles(self, user_ids: dict):
+        start_time = time.perf_counter()
+        assert isinstance(user_ids, dict), "user_ids IDs must be a list"
+        added_member_roles = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in user_ids:
+                for user_id in user_ids[guild_id]["user_ids"]:
+                    for role_id in user_ids[guild_id]["role_ids"]:
+                        tasks.append(self.add_guild_member_role(session, guild_id, user_id, role_id, added_member_roles, total_ratelimits))
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": added_member_roles}
+    
+    async def add_guild_member_role(self, session, guild_id, user_id, role_id, added_member_roles={}, total_ratelimits=0):
+        logging.debug(f'Started adding role ID: {role_id}, to user ID: {user_id}, in guild ID: {guild_id}')
+        while True:   
+            async with session.patch(f"{self.url}/guilds/{guild_id}/members/{user_id}/roles/{role_id}") as response:
+                if response.status in [201, 200, 204]:
+                    if not str(added_member_roles) in added_member_roles:
+                        added_member_roles[str(guild_id)][str(role_id)] = []
+                    added_member_roles[str(guild_id)][str(role_id)].append(user_id)
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return added_member_roles
+
+    async def mass_remove_guilds_members_roles(self, user_ids: dict):
+        start_time = time.perf_counter()
+        assert isinstance(user_ids, dict), "user_ids IDs must be a list"
+        removed_member_roles = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers={'Authorization': f'{self.token}'}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in user_ids:
+                for user_id in user_ids[guild_id]["user_ids"]:
+                    for role_id in user_ids[guild_id]["role_ids"]:
+                        tasks.append(self.remove_guild_member_role(session, guild_id, user_id, role_id, removed_member_roles, total_ratelimits))
+            await asyncio.gather(*tasks) 
+        end_time = time.perf_counter() - start_time
+        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": removed_member_roles}
+    
+    async def remove_guild_member_role(self, session, guild_id, user_id, role_id, removed_member_roles={}, total_ratelimits=0):
+        logging.debug(f'Started removing role ID: {role_id}, to user ID: {user_id}, in guild ID: {guild_id}')
+        while True:   
+            async with session.delete(f"{self.url}/guilds/{guild_id}/members/{user_id}/roles/{role_id}") as response:
+                if response.status in [201, 200, 204]:
+                    if not str(removed_member_roles) in removed_member_roles:
+                        removed_member_roles[str(guild_id)][str(role_id)] = []
+                    removed_member_roles[str(guild_id)][str(role_id)].append(user_id)
+                    break
+                elif response.status == 429:
+                    total_ratelimits += 1
+                    if not self.skipOnRatelimit:
+                        await asyncio.sleep(self.ratelimitCooldown)
+                    else:
+                        break
+                else:
+                    break
+        return removed_member_roles
