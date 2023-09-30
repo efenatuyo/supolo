@@ -1680,7 +1680,7 @@ class supolo:
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_emojis": deleted_emojis}
     
     async def delete_guild_emoji(self, session, guild_id, emoji_id, deleted_emojis={}, total_ratelimits=0):
-    """
+        """
     Delete a guild emoji.
 
     Args:
@@ -1706,7 +1706,7 @@ class supolo:
             print(f"Emoji {emoji_id} deleted successfully from guild {guild_id}")
         else:
             print(f"Failed to delete emoji {emoji_id} from guild {guild_id}")
-    """
+        """
         logging.debug(f'Started deleting emoji ID: {emoji_id}, in guild ID: {guild_id}')
         while True:   
             async with session.delete(f"{self.url}/guilds/{guild_id}/emojis/{emoji_id}") as response:
