@@ -131,3 +131,13 @@ print(created_guilds_emojis)
 # need aiohttp session
 created_guild_emoji = asyncio.run(x.create_guild_emoji(session, guild_id=1141399067142926386, data_create={}))
 print(created_guild_emoji)
+
+# mass modify guilds emojis
+# see json at https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
+modified_emojis = asyncio.run(x.mass_modify_guilds_emojis(emoji_ids={"guild_id": ["emoji_id"]}, data_modify={}))
+print(modified_emojis)
+
+# modify guild emoji
+# need aiohttp session
+modified_emoji = asyncio.run(x.modify_guild_emoji(session, guild_id=1141399067142926386, emoji_id=1129929174090514552, data_modify={}))
+print(modified_emoji)
