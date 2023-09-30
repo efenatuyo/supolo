@@ -1,6 +1,6 @@
 from supolo import supolo
 import asyncio
-x = supolo(tokenType="bot", token="")
+x = supolo(tokenType="bot", token="") # bot / user
 
 
 # get servers token is in
