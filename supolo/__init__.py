@@ -1818,7 +1818,7 @@ class supolo:
         return added_member_roles
 
     async def mass_remove_guilds_members_roles(self, user_ids: dict):
-    """
+        """
     Mass-remove roles from members in multiple guilds.
 
     Args:
@@ -1846,7 +1846,7 @@ class supolo:
 
     Note:
         This method removes specified roles from members in multiple guilds and returns the removed member roles.
-    """
+        """
         start_time = time.perf_counter()
         assert isinstance(user_ids, dict), "user_ids IDs must be a list"
         removed_member_roles = {}
@@ -1862,7 +1862,7 @@ class supolo:
         return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": removed_member_roles}
     
     async def remove_guild_member_role(self, session, guild_id, user_id, role_id, removed_member_roles={}, total_ratelimits=0):
-    """
+        """
     Mass-remove roles from members in multiple guilds.
 
     Args:
@@ -1890,7 +1890,7 @@ class supolo:
 
     Note:
         This method removes specified roles from members in multiple guilds and returns the removed member roles.
-    """
+        """
         logging.debug(f'Started removing role ID: {role_id}, to user ID: {user_id}, in guild ID: {guild_id}')
         while True:   
             async with session.delete(f"{self.url}/guilds/{guild_id}/members/{user_id}/roles/{role_id}") as response:
