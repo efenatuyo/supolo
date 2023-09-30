@@ -1,6 +1,8 @@
 # supolo
 a fast discord nuke bot based package
 
+[![Upload Python Package](https://github.com/efenatuyo/supolo/actions/workflows/python-publish.yml/badge.svg)](https://github.com/efenatuyo/supolo/actions/workflows/python-publish.yml)
+
 in early stages !!
 
 example of response
