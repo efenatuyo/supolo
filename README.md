@@ -3,8 +3,6 @@ a fast discord nuke bot based package
 
 [![pypi](https://github.com/efenatuyo/supolo/actions/workflows/python-publish.yml/badge.svg)](https://github.com/efenatuyo/supolo/actions/workflows/python-publish.yml)
 
-in early stages !!
-
 example of response
 `
 {'success': True, 'time_taken': 0.24078199997893535, 'total_ratelimits': 0, 'info': {}}
