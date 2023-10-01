@@ -1,2 +1,0 @@
-https://discord.com/developers/docs/resources/guild#modify-guild-role-positions
-https://discord.com/developers/docs/resources/guild#modify-guild-role
