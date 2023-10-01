@@ -129,7 +129,7 @@ class supolo:
                 await asyncio.gather(*guild_tasks)
                     
                 end_time = time.perf_counter() - start_time
-                return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits + guilds_data["total_ratelimits"], "users": shared_users}
+                return {'success': bool(shared_users), 'time_taken': end_time, 'total_ratelimits': total_ratelimits + guilds_data["total_ratelimits"], "users": shared_users}
 
     async def get_guilds_channels(self, guild_ids: list):
         """
@@ -169,7 +169,7 @@ class supolo:
             tasks = [self.get_guild_channels(session, guild_id, shared_channels, total_ratelimits) for guild_id in guild_ids]
             await asyncio.gather(*tasks)
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "channels": shared_channels}
+        return {'success': bool(shared_channels), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "channels": shared_channels}
         
     async def get_guild_channels(self, session, guild_id, shared_channels={}, total_ratelimits=0):
         """
@@ -295,7 +295,7 @@ class supolo:
             tasks = [self.delete_guild_channel(session, channel_id, deleted_channels, total_ratelimits) for channel_id in channel_ids]
             await asyncio.gather(*tasks)
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_channels": deleted_channels}    
+        return {'success': bool(deleted_channels), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_channels": deleted_channels}    
             
     async def get_guilds_members(self, guild_ids: list):
         """
@@ -336,7 +336,7 @@ class supolo:
                 guild_tasks.append(self.get_guild_members(session, f'{self.url}/guilds/{guild_id}/members?limit=1000', shared_users, guild_id, total_ratelimits, "get_shared_user_ids"))
             await asyncio.gather(*guild_tasks)
             
-            return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimits, 'users': shared_users}
+            return {"success": bool(shared_users), 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimits, 'users': shared_users}
 
     async def get_guild_members(self, session=None, url=None, shared_users={}, guild_id=None, total_ratelimits=0, method=None):
         """
@@ -450,7 +450,7 @@ class supolo:
                                       user_id=user['id'], unbanned_users=unbanned_users,
                                       total_ratelimit=total_ratelimit, timeout=timeout, guild_id=guild))
             await asyncio.gather(*unban_tasks)
-        return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit[0], 'unbanned_users': unbanned_users}
+        return {"success": bool(unbanned_users), 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit[0], 'unbanned_users': unbanned_users}
         
         
     async def single_unban(self, session, url, user_id, unbanned_users, total_ratelimit, timeout, guild_id):
@@ -544,7 +544,7 @@ class supolo:
                         kicked_users[str(guild_id)] = []
                     kick_tasks.append(self.single_kick(session, f"{self.url}/guilds/{guild_id}/members/{user}", user, kicked_users, total_ratelimit, timeout, guild_id))
             await asyncio.gather(*kick_tasks)
-            return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit[0], 'kicked_users': kicked_users}
+            return {"success": bool(kicked_users), 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimit[0], 'kicked_users': kicked_users}
 
 
     async def single_kick(self, session, url, user_id, kicked_users, total_ratelimit, timeout, guild_id):
@@ -634,7 +634,7 @@ class supolo:
                 guild_tasks.append(self.get_guild_banned_users(guild_id, banned_users, total_ratelimits))
             await asyncio.gather(*guild_tasks)
             
-            return {"success": True, 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimits, 'banned_users': banned_users}
+            return {"success": bool(banned_users), 'time_taken': time.perf_counter() - start_time, "total_ratelimits": total_ratelimits, 'banned_users': banned_users}
         
     async def get_guild_banned_users(self, guild_id, banned_users={}, total_ratelimits=0):
         """
@@ -687,7 +687,7 @@ class supolo:
                     else:
                         logging.error(f"Failed to fetch banned users for guild {guild_id}: {response.status}")
                         break
-        return {"success": True, 'time_taken': time.perf_counter() - start_time, 'total_ratelimits': total_ratelimits, "users": banned_users[str(guild_id)]}
+        return {"success": bool(banned_users[str(guild_id)]), 'time_taken': time.perf_counter() - start_time, 'total_ratelimits': total_ratelimits, "users": banned_users[str(guild_id)]}
     
     async def mass_ban(self, guild_ids: list, timeout: int =5):
         """
@@ -731,7 +731,7 @@ class supolo:
                         banned_users[str(guild_id)] = []
                     ban_tasks.append(self.single_ban(session, f"{self.url}/guilds/{guild_id}/bans/{user}", user, banned_users, total_ratelimit, timeout, guild_id))
             await asyncio.gather(*ban_tasks)
-            return {'success': True, 'time_taken': time.perf_counter() - start_time, 'total_ratelimits': total_ratelimit[0], "banned_users": banned_users}
+            return {'success': bool(banned_users), 'time_taken': time.perf_counter() - start_time, 'total_ratelimits': total_ratelimit[0], "banned_users": banned_users}
 
     async def single_ban(self, session, url, user_id, banned_users, total_ratelimit, timeout, guild_id):
         """
@@ -867,7 +867,7 @@ class supolo:
                     
             await asyncio.gather(*tasks)
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_channels": created_channels} 
+        return {'success': bool(created_channels), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_channels": created_channels} 
     
     async def spam_guilds_channels(self, channel_ids: list, amount: int =10, data_message: dict ={"content": "@everyone"}, data_webhook: dict ={"name": ":)"}, method: str ="bot"):
         """
@@ -907,7 +907,7 @@ class supolo:
             await asyncio.gather(*tasks)
         
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "spammed_channels": spammed_channels}
+        return {'success': bool(spammed_channels), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "spammed_channels": spammed_channels}
 
     async def spam_guild_channel(self, session, channel_id, amount, data_message, method="bot", data_webhook={}, spammed_channels=[], total_ratelimits=0):
         """
@@ -1048,7 +1048,7 @@ class supolo:
             await asyncio.gather(*tasks)
         
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_roles": created_roles}
+        return {'success': bool(created_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_roles": created_roles}
     
     async def create_guild_role(self, session, guild_id, data_role, created_roles={}, total_ratelimits=0):
         """
@@ -1096,6 +1096,198 @@ class supolo:
             else:
                 break
         return created_roles
+
+    async def modify_guilds_roles_position(self, guild_ids: list, data_role: dict = {}):
+        """
+    Modify the position of roles in multiple guilds.
+
+    Args:
+        guild_ids (list): A list of guild IDs where role positions will be modified.
+        data_role (dict, optional): A dictionary containing the role data to be applied.
+
+    Returns:
+        dict: A dictionary containing the result of the modification operation, including modified role positions.
+
+    Raises:
+        AssertionError: If guild_ids is not a list.
+
+    Example Usage:
+        # Modify the position of roles in multiple guilds.
+        guild_ids = [123456789012345678, 987654321098765432]
+        data_role = {"name": "New Role", "position": 3}
+        result = await discord_utility.modify_guilds_roles_position(guild_ids, data_role)
+
+        if result["success"]:
+            print(f"Role positions modified in multiple guilds")
+        else:
+            print(f"Failed to modify role positions: {result['message']}")
+
+    Note:
+        This method modifies the position of roles in multiple guilds and returns the modified role positions.
+        """
+        start_time = time.perf_counter()
+        assert isinstance(guild_ids, list), "guild_ids has to be a list"
+        modified_roles = {}
+        total_ratelimits = 0       
+        async with aiohttp.ClientSession(headers = {'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
+            tasks = []
+            for guild_id in guild_ids:
+                    tasks.append(self.modify_guild_role_position(session, guild_id, data_role, modified_roles, total_ratelimits))
+            await asyncio.gather(*tasks)
+        
+        end_time = time.perf_counter() - start_time
+        return {'success': bool(modified_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_roles": modified_roles}
+    
+    async def modify_guild_role_position(self, session, guild_id, data_role, modified_roles={}, total_ratelimits=0):
+        """
+    Modify the position of a role in a guild.
+
+    Args:
+        session: The aiohttp session for making HTTP requests.
+        guild_id (int): The ID of the guild where the role is located.
+        data_role (dict): A dictionary containing role data, including the role ID and the new position.
+        modified_roles (dict, optional): A dictionary to store modified role data (used for tracking multiple modifications).
+        total_ratelimits (int, optional): A counter to track the total number of ratelimit responses received.
+
+    Returns:
+        dict: A dictionary containing the result of the modification operation, including the modified role data.
+
+    Note:
+        This method modifies the position of a role in a guild and returns the modified role data.
+
+    Example Usage:
+        # Define the guild ID where you want to modify role positions
+        guild_id = 123456789012345678  # Replace with your guild's ID
+
+        # Define the role data that specifies the changes you want to make
+        data_role = {
+            "id": 123,  # Role ID to modify
+            "position": 2  # New position for the role
+        }
+
+        # Call the modify_guild_role_position method to modify the role position
+        result = await discord_utility.modify_guild_role_position(session, guild_id, data_role)
+
+        if result["success"]:
+            print(f"Role positions modified in guild {guild_id}")
+        else:
+            print(f"Failed to modify role positions: {result['message']}")
+        """
+        logging.debug(f'Started modifying role position in guild ID: {guild_id}')
+        while True:   
+         async with session.patch(f"{self.url}/guilds/{guild_id}/roles", json=data_role) as response:
+            if response.status in [201, 200, 204]:
+                if not str(guild_id) in modified_roles:
+                    modified_roles[str(guild_id)] = []
+                modified_roles[str(guild_id)].append(await response.json())
+                break
+            elif response.status == 429:
+                total_ratelimits += 1
+                if not self.skipOnRatelimit:
+                    await asyncio.sleep(self.ratelimitCooldown)
+                else:
+                    break
+            else:
+                break
+        return modified_roles
+
+    async def modify_guilds_roles(self, role_ids: dict, data_role: dict = {}):
+            """
+    Modify roles in multiple guilds.
+
+    Args:
+        role_ids (dict): A dictionary containing guild IDs as keys and a list of role IDs as values.
+            Example: {123456789012345678: [123, 456], 987654321098765432: [789, 987]}
+        data_role (dict, optional): A dictionary containing role data to apply to all specified roles.
+
+    Returns:
+        dict: A dictionary containing the result of the modification operation, including the modified roles.
+
+    Raises:
+        AssertionError: If role_ids is not a dictionary.
+
+    Example Usage:
+        # Modify roles in multiple guilds.
+        role_ids = {
+            123456789012345678: [123, 456],
+            987654321098765432: [789, 987]
+        }
+        data_role = {
+            "color": 0xFF0000  # Change role color to red
+        }
+        result = await discord_utility.modify_guilds_roles(role_ids, data_role)
+
+        if result["success"]:
+            print(f"Roles modified in multiple guilds")
+        else:
+            print(f"Failed to modify roles: {result['message']}")
+
+    Note:
+        This method modifies specified roles in multiple guilds and returns the modified roles.
+            """
+            start_time = time.perf_counter()
+            assert isinstance(role_ids, dict), "role_ids has to be a list"
+            modified_roles = {}
+            total_ratelimits = 0       
+            async with aiohttp.ClientSession(headers = {'Authorization': self.token}, connector=aiohttp.TCPConnector(limit=None)) as session:
+                tasks = []
+                for guild_id in role_ids:
+                    for role_id in role_ids[guild_id]:
+                        tasks.append(self.modify_guild_role(session, guild_id, role_id, data_role, modified_roles, total_ratelimits))
+                await asyncio.gather(*tasks)
+            
+            end_time = time.perf_counter() - start_time
+            return {'success': bool(modified_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_roles": modified_roles}
+    
+    async def modify_guild_role(self, session, guild_id, role_id, data_role, modified_roles={}, total_ratelimits=0):
+        """
+        Modify a role in a guild.
+
+        Args:
+            session: The aiohttp session for making HTTP requests.
+            guild_id (int): The ID of the guild where the role is located.
+            role_id (int): The ID of the role to be modified.
+            data_role (dict): A dictionary containing role data to apply to the specified role.
+            modified_roles (dict, optional): A dictionary to store modified role IDs (used for tracking multiple modifications).
+            total_ratelimits (int, optional): A counter to track the total number of ratelimit responses received.
+
+        Returns:
+            dict: A dictionary containing the result of the modification operation, including the modified role ID.
+
+        Example Usage:
+            # Modify a role in a guild.
+            guild_id = 123456789012345678  # Replace with the actual guild ID
+            role_id = 987654321098765432  # Replace with the actual role ID
+            data_role = {
+                "color": 0xFF0000  # Change role color to red
+            }
+            result = await discord_utility.modify_guild_role(session, guild_id, role_id, data_role)
+
+            if result["success"]:
+                print(f"Role {role_id} modified in guild {guild_id}")
+            else:
+                print(f"Failed to modify role: {result['message']}")
+
+        Note:
+            This method modifies a specific role in a guild and returns the modified role ID.
+        """
+        logging.debug(f'Started modifying role in guild ID: {guild_id}')
+        while True:   
+         async with session.patch(f"{self.url}/guilds/{guild_id}/roles/{role_id}", json=data_role) as response:
+            if response.status in [201, 200, 204]:
+                if not str(guild_id) in modified_roles:
+                    modified_roles[str(guild_id)] = []
+                modified_roles[str(guild_id)].append(role_id)
+                break
+            elif response.status == 429:
+                total_ratelimits += 1
+                if not self.skipOnRatelimit:
+                    await asyncio.sleep(self.ratelimitCooldown)
+                else:
+                    break
+            else:
+                break
+        return modified_roles
     
     async def get_guilds_roles(self, guild_ids: list):
         """
@@ -1133,7 +1325,7 @@ class supolo:
             await asyncio.gather(*tasks)
         
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "guilds_roles": guilds_roles}
+        return {'success': bool(guilds_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "guilds_roles": guilds_roles}
     
     async def get_guild_roles(self, session, guild_id, guilds_roles={}, total_ratelimits=0):
         """
@@ -1208,7 +1400,7 @@ class supolo:
                     tasks.append(self.delete_guild_role(session, guild_id, role_id, deleted_roles, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_roles": deleted_roles}
+        return {'success': bool(deleted_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_roles": deleted_roles}
     
     async def delete_guild_role(self, session, guild_id, role_id, deleted_roles={}, total_ratelimits=0):
         """
@@ -1287,7 +1479,7 @@ class supolo:
                     tasks.append(self.modify_guild_user(session, guild_id, user_id, data_modify, modified_users, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_users": modified_users}
+        return {'success': bool(modified_users), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_users": modified_users}
     
     async def modify_guild_user(self, session, guild_id, user_id, data_modify, modified_users={}, total_ratelimits=0):
         """
@@ -1373,7 +1565,7 @@ class supolo:
             tasks = [self.modify_guild(session, guild_id, data_modify, modified_guilds, total_ratelimits) for guild_id in guild_ids]
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_guilds": modified_guilds}
+        return {'success': bool(modified_guilds), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "modified_guilds": modified_guilds}
     
     async def modify_guild(self, session, guild_id, data_modify, modified_guilds={}, total_ratelimits=0):
         """
@@ -1473,7 +1665,7 @@ class supolo:
             tasks = [self.create_guild_emoji(session, guild_id, data_create, created_emojis, total_ratelimits) for i in range(amount) for guild_id in guild_ids]
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_emojis": created_emojis}
+        return {'success': bool(created_emojis), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_emojis": created_emojis}
     
     async def create_guild_emoji(self, session, guild_id, data_create, created_emojis={}, total_ratelimits=0):
         """
@@ -1586,7 +1778,7 @@ class supolo:
                     tasks.append(self.modify_guild_emoji(session, guild_id, emoji_id, data_modify, modified_emojis, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_emojis": modified_emojis}
+        return {'success': bool(modified_emojis), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "created_emojis": modified_emojis}
     
     async def modify_guild_emoji(self, session, guild_id, emoji_id, data_modify, modified_emojis={}, total_ratelimits=0):
         """
@@ -1677,7 +1869,7 @@ class supolo:
                     tasks.append(self.delete_guild_emoji(session, guild_id, emoji_id, deleted_emojis, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_emojis": deleted_emojis}
+        return {'success': bool(deleted_emojis), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "deleted_emojis": deleted_emojis}
     
     async def delete_guild_emoji(self, session, guild_id, emoji_id, deleted_emojis={}, total_ratelimits=0):
         """
@@ -1767,7 +1959,7 @@ class supolo:
                         tasks.append(self.add_guild_member_role(session, guild_id, user_id, role_id, added_member_roles, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": added_member_roles}
+        return {'success': bool(added_member_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": added_member_roles}
     
     async def add_guild_member_role(self, session, guild_id, user_id, role_id, added_member_roles={}, total_ratelimits=0):
         """
@@ -1859,7 +2051,7 @@ class supolo:
                         tasks.append(self.remove_guild_member_role(session, guild_id, user_id, role_id, removed_member_roles, total_ratelimits))
             await asyncio.gather(*tasks) 
         end_time = time.perf_counter() - start_time
-        return {'success': True, 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": removed_member_roles}
+        return {'success': bool(removed_member_roles), 'time_taken': end_time, 'total_ratelimits': total_ratelimits, "added_member_roles": removed_member_roles}
     
     async def remove_guild_member_role(self, session, guild_id, user_id, role_id, removed_member_roles={}, total_ratelimits=0):
         """
@@ -1908,3 +2100,4 @@ class supolo:
                 else:
                     break
         return removed_member_roles
+    
