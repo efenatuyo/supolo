@@ -214,6 +214,8 @@ class supolo:
                     await asyncio.sleep(self.ratelimitCooldown)
                 else:
                     break
+            else:
+                return shared_channels
 
         return shared_channels
 
