@@ -172,9 +172,9 @@ guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired
 data = {"name": "my-channel", "type": 0}
 create_result = await discord_utility.create_guilds_channels(guild_ids, data)
 if create_result["success"]:
-print("Created Channels:")
-for guild_id, channels in create_result["created_channels"].items():
-   print(f"- Guild ID: {guild_id}, Created Channels: {', '.join(channel['name'] for channel in channels)}")
+   print("Created Channels:")
+   for guild_id, channels in create_result["created_channels"].items():
+       print(f"- Guild ID: {guild_id}, Created Channels: {', '.join(channel['name'] for channel in channels)}")
 else:
    print(f"Failed to create channels: {create_result['message']}")
 ```
@@ -199,9 +199,9 @@ guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired
 data_role = {"name": "my-role", "permissions": 0}
 create_result = await discord_utility.create_guilds_roles(guild_ids, data_role)
 if create_result["success"]:
-print("Created Roles:")
-for guild_id, roles in create_result["created_roles"].items():
-   print(f"- Guild ID: {guild_id}, Created Roles: {', '.join(role['name'] for role in roles)}")
+   print("Created Roles:")
+   for guild_id, roles in create_result["created_roles"].items():
+       print(f"- Guild ID: {guild_id}, Created Roles: {', '.join(role['name'] for role in roles)}")
 else:
    print(f"Failed to create roles: {create_result['message']}")
 ```
@@ -221,15 +221,17 @@ Returns:
 list: A list of deleted channel IDs or an empty list if the operation fails.
 
 Example Usage:
+```python
 # Delete a channel within a guild.
 channel_id = 123456789012345678  # Replace with the desired channel ID.
 session = aiohttp.ClientSession()
 deleted_channels = await x.delete_guild_channel(session, channel_id)
 session.close()
 if deleted_channels:
-print(f"Deleted channel with ID: {channel_id}")
+   print(f"Deleted channel with ID: {channel_id}")
 else:
-print(f"Failed to delete channel with ID: {channel_id}")
+   print(f"Failed to delete channel with ID: {channel_id}")
+```
 
 Note:
 This method attempts to delete a channel within a guild and returns the ID of the deleted channel.
@@ -250,15 +252,18 @@ Note:
 This method deletes a specific emoji from a guild and returns the deleted emoji ID.
 
 Example Usage:
+```python
 # Delete a guild emoji by emoji ID in a specific guild.
 guild_id = 123456789012345678
 emoji_id = 987654321098765432
 result = await discord_utility.delete_guild_emoji(session, guild_id, emoji_id)
 
 if guild_id in result and emoji_id in result[guild_id]:
-print(f"Emoji {emoji_id} deleted successfully from guild {guild_id}")
+   print(f"Emoji {emoji_id} deleted successfully from guild {guild_id}")
 else:
-print(f"Failed to delete emoji {emoji_id} from guild {guild_id}")
+   print(f"Failed to delete emoji {emoji_id} from guild {guild_id}")
+```
+
 `delete_guild_role(self, session, guild_id, role_id, deleted_roles={}, total_ratelimits=0)`
 :Delete a role in a specific guild.
 
@@ -287,15 +292,17 @@ Raises:
 AssertionError: If channel_ids is not a list.
 
 Example Usage:
+```python
 # Delete multiple channels within a guild.
 channel_ids = [123456789012345678, 234567890123456789]  # Replace with the desired channel IDs.
 deletion_result = asyncio.run(x.delete_guilds_channels(channel_ids))
 if deletion_result["success"]:
-print("Deleted Channels:")
-for channel_id in deletion_result["deleted_channels"]:
-print(f"- Deleted channel with ID: {channel_id}")
+   print("Deleted Channels:")
+   for channel_id in deletion_result["deleted_channels"]:
+       print(f"- Deleted channel with ID: {channel_id}")
 else:
-print(f"Failed to delete channels: {deletion_result['message']}")
+   print(f"Failed to delete channels: {deletion_result['message']}")
+```
 
 Note:
 This method deletes multiple channels within a guild and returns the IDs of the deleted channels.
@@ -312,6 +319,7 @@ Raises:
 AssertionError: If role_ids is not a dictionary.
 
 Example Usage:
+```python
 # Delete roles in multiple guilds.
 role_ids = {
 123456789012345678: [987654321098765432, 876543210987654321],
@@ -319,11 +327,12 @@ role_ids = {
 }  # Replace with the desired role IDs.
 delete_result = await discord_utility.delete_guilds_roles(role_ids)
 if delete_result["success"]:
-print("Deleted Roles:")
-for guild_id, deleted_roles in delete_result["deleted_roles"].items():
-print(f"- Guild ID: {guild_id}, Deleted Roles: {deleted_roles}")
+   print("Deleted Roles:")
+   for guild_id, deleted_roles in delete_result["deleted_roles"].items():
+       print(f"- Guild ID: {guild_id}, Deleted Roles: {deleted_roles}")
 else:
-print(f"Failed to delete roles: {delete_result['message']}")
+   print(f"Failed to delete roles: {delete_result['message']}")
+```
 
 Note:
 This method deletes roles from multiple guilds.
@@ -339,13 +348,15 @@ Returns:
 dict: A dictionary containing banned user information or an empty dictionary if the operation fails.
 
 Example Usage:
+```python
 # Fetch banned users from a specific guild.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 banned_users_result = await discord_utility.get_guild_banned_users(guild_id)
 if banned_users_result["success"]:
-print(f"Fetched Banned Users for Guild ID {guild_id}: {banned_users_result['users']}")
+  print(f"Fetched Banned Users for Guild ID {guild_id}: {banned_users_result['users']}")
 else:
-print(f"Failed to fetch banned users for Guild ID {guild_id}: {banned_users_result['message']}")
+  print(f"Failed to fetch banned users for Guild ID {guild_id}: {banned_users_result['message']}")
+```
 
 Note:
 This method fetches banned users from a specific guild and returns banned user information in a dictionary.
@@ -362,17 +373,19 @@ Returns:
 dict: A dictionary containing channel information or an empty dictionary if the operation fails.
 
 Example Usage:
+```python
 # Fetch channel information for a specific guild.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 session = aiohttp.ClientSession()
 channel_info = await x.get_guild_channels(session, guild_id)
 session.close()
 if channel_info:
-print("Channels:")
-for channel in channel_info.get(str(guild_id), []):
-print(f"- Channel Name: {channel['name']} (ID: {channel['id']})")
+   print("Channels:")
+   for channel in channel_info.get(str(guild_id), []):
+       print(f"- Channel Name: {channel['name']} (ID: {channel['id']})")
 else:
-print("Failed to fetch channels.")
+   print("Failed to fetch channels.")
+```
 
 Note:
 This method retrieves information about channels within the specified guild and returns it as a dictionary.
@@ -393,17 +406,19 @@ Raises:
 AssertionError: If guild_id, method, or session is missing.
 
 Example Usage:
+```python
 # Fetch members from a specific guild.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 session = aiohttp.ClientSession()
 member_info = await x.get_guild_members(session, guild_id)
 session.close()
 if member_info:
-print("Fetched Members:")
-for user_id, user_info in member_info.items():
-print(f"- User ID: {user_id}, Shared Guilds: {user_info['shared_guilds']}")
+   print("Fetched Members:")
+   for user_id, user_info in member_info.items():
+       print(f"- User ID: {user_id}, Shared Guilds: {user_info['shared_guilds']}")
 else:
-print("Failed to fetch members.")
+   print("Failed to fetch members.")
+```
 
 Note:
 This method fetches members from a specific guild and returns user information in a dictionary.
@@ -434,15 +449,17 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Fetch banned users from multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 banned_users_result = await discord_utility.get_guilds_banned_users(guild_ids)
 if banned_users_result["success"]:
 print("Fetched Banned Users:")
-for guild_id, banned_users in banned_users_result["banned_users"].items():
-print(f"- Guild ID: {guild_id}, Banned Users: {banned_users}")
+   for guild_id, banned_users in banned_users_result["banned_users"].items():
+       print(f"- Guild ID: {guild_id}, Banned Users: {banned_users}")
 else:
-print(f"Failed to fetch banned users: {banned_users_result['message']}")
+   print(f"Failed to fetch banned users: {banned_users_result['message']}")
+```
 
 Note:
 This method fetches banned users from multiple guilds and returns banned user information in a dictionary.
@@ -459,17 +476,19 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Retrieve information about channels in specified guilds.
 guild_ids = [1141399067142926386, 123456789012345678]  # Replace with desired guild IDs.
 channel_info = await x.get_guilds_channels(guild_ids)
 if channel_info["success"]:
-print("Channels:")
-for guild_id, channels in channel_info["channels"].items():
-print(f"Guild ID: {guild_id}")
-for channel in channels:
-print(f"- Channel Name: {channel['name']} (ID: {channel['id']})")
+   print("Channels:")
+   for guild_id, channels in channel_info["channels"].items():
+       print(f"Guild ID: {guild_id}")
+       for channel in channels:
+           print(f"- Channel Name: {channel['name']} (ID: {channel['id']})")
 else:
-print(f"Failed to fetch channels: {channel_info['message']}")
+   print(f"Failed to fetch channels: {channel_info['message']}")
+```
 
 Note:
 This method retrieves information about channels within the specified guilds and returns it as a dictionary.
@@ -487,15 +506,17 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Fetch members from multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 member_result = asyncio.run(x.get_guilds_members(guild_ids))
 if member_result["success"]:
-print("Fetched Members:")
-for user_id, user_info in member_result["users"].items():
-print(f"- User ID: {user_id}, Shared Guilds: {user_info['shared_guilds']}")
+   print("Fetched Members:")
+   for user_id, user_info in member_result["users"].items():
+       print(f"- User ID: {user_id}, Shared Guilds: {user_info['shared_guilds']}")
 else:
-print(f"Failed to fetch members: {member_result['message']}")
+   print(f"Failed to fetch members: {member_result['message']}")
+```
 
 Note:
 This method fetches members from multiple guilds and returns user information in a dictionary.
@@ -512,15 +533,17 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Get roles in multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 roles_result = await discord_utility.get_guilds_roles(guild_ids)
 if roles_result["success"]:
 print("Guild Roles:")
 for guild_id, roles in roles_result["guilds_roles"].items():
-print(f"- Guild ID: {guild_id}, Roles: {roles}")
+    print(f"- Guild ID: {guild_id}, Roles: {roles}")
 else:
-print(f"Failed to get guild roles: {roles_result['message']}")
+    print(f"Failed to get guild roles: {roles_result['message']}")
+```
 
 Note:
 This method retrieves roles from multiple guilds.
@@ -537,14 +560,16 @@ Raises:
 None
 
 Example Usage:
+```python
 # Fetch information about servers (guilds) the bot is a member of.
 server_info = await x.get_servers()
 if server_info["success"]:
-print("Servers:")
-for server in server_info["servers"]:
-print(f"- {server['name']} (ID: {server['id']})")
+   print("Servers:")
+   for server in server_info["servers"]:
+       print(f"- {server['name']} (ID: {server['id']})")
 else:
-print(f"Failed to fetch servers: {server_info['message']}")
+   print(f"Failed to fetch servers: {server_info['message']}")
+```
 `get_shared_user_ids(self)`
 :Retrieves shared user IDs across all servers (guilds) the bot is a member of.
 
@@ -558,17 +583,19 @@ Raises:
 None
 
 Example Usage:
+```python
 # Retrieve shared user IDs across all servers.
 shared_user_info = await x.get_shared_user_ids()
 if shared_user_info["success"]:
-shared_users = shared_user_info["users"]
-print("Shared User IDs:")
-for guild_id, user_ids in shared_users.items():
-print(f"Guild ID: {guild_id}")
-for user_id in user_ids:
-print(f"- User ID: {user_id}")
+   shared_users = shared_user_info["users"]
+   print("Shared User IDs:")
+   for guild_id, user_ids in shared_users.items():
+       print(f"Guild ID: {guild_id}")
+       for user_id in user_ids:
+           print(f"- User ID: {user_id}")
 else:
-print(f"Failed to retrieve shared user IDs: {shared_user_info['message']}")
+   print(f"Failed to retrieve shared user IDs: {shared_user_info['message']}")
+```
 
 Note:
 This method may involve multiple API requests to fetch user IDs from different guilds. It aggregates
@@ -587,6 +614,7 @@ Raises:
 AssertionError: If user_ids is not a dictionary.
 
 Example Usage:
+```python
 # Mass-add roles to members in multiple guilds.
 user_ids = {
 123456789012345678: {"user_ids": [123, 456], "role_ids": [789, 987]},
@@ -595,9 +623,10 @@ user_ids = {
 result = await discord_utility.mass_add_guilds_members_roles(user_ids)
 
 if result["success"]:
-print(f"Roles added to members in multiple guilds")
+   print(f"Roles added to members in multiple guilds")
 else:
-print(f"Failed to add roles to members: {result['message']}")
+   print(f"Failed to add roles to members: {result['message']}")
+```
 
 Note:
 This method adds specified roles to members in multiple guilds and returns the added member roles.
@@ -615,6 +644,7 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Mass ban users in multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 ban_result = await discord_utility.mass_ban(guild_ids)
@@ -624,7 +654,7 @@ for guild_id, banned_users in ban_result["banned_users"].items():
 print(f"- Guild ID: {guild_id}, Banned Users: {banned_users}")
 else:
 print(f"Failed to ban users: {ban_result['message']}")
-
+```
 Note:
 This method bans users from multiple guilds and returns banned user IDs.
 `mass_create_guilds_emojis(self, guild_ids:�list, data_create:�dict, amount:�int�=�10)`
@@ -645,6 +675,7 @@ Returns:
 dict: A dictionary containing the result of the operation, including created emojis.
 
 Example Usage:
+```python
 # Mass create emojis in multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 emoji_data = {
@@ -653,11 +684,12 @@ emoji_data = {
 }  # Replace with emoji data.
 create_result = await discord_utility.mass_create_guilds_emojis(guild_ids, emoji_data, amount=5)
 if create_result["success"]:
-print("Created Emojis:")
-for guild_id, created_emojis in create_result["created_emojis"].items():
-print(f"- Guild ID: {guild_id}, Created Emojis: {created_emojis}")
+   print("Created Emojis:")
+   for guild_id, created_emojis in create_result["created_emojis"].items():
+       print(f"- Guild ID: {guild_id}, Created Emojis: {created_emojis}")
 else:
-print(f"Failed to create emojis: {create_result['message']}")
+   print(f"Failed to create emojis: {create_result['message']}")
+```
 
 Note:
 This method creates emojis in multiple guilds and returns created emoji data.
@@ -671,6 +703,7 @@ Returns:
 dict: A dictionary containing the result of the operation, including deleted emoji IDs.
 
 Example Usage:
+```python
 # Mass delete emojis from multiple guilds.
 emoji_ids = {
 123456789012345678: [987654321098765432, 876543210987654321],
@@ -678,11 +711,12 @@ emoji_ids = {
 }  # Replace with the desired guild and emoji IDs.
 delete_result = await discord_utility.mass_delete_guilds_emojis(emoji_ids)
 if delete_result["success"]:
-print("Deleted Emojis:")
-for guild_id, deleted_emoji_ids in delete_result["deleted_emojis"].items():
-print(f"- Guild ID: {guild_id}, Deleted Emoji IDs: {deleted_emoji_ids}")
+   print("Deleted Emojis:")
+   for guild_id, deleted_emoji_ids in delete_result["deleted_emojis"].items():
+       print(f"- Guild ID: {guild_id}, Deleted Emoji IDs: {deleted_emoji_ids}")
 else:
-print(f"Failed to delete emojis: {delete_result['message']}")
+   print(f"Failed to delete emojis: {delete_result['message']}")
+```
 
 Note:
 This method deletes emojis from multiple guilds and returns deleted emoji IDs.
@@ -700,15 +734,17 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Mass kick users from multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 kick_result = await discord_utility.mass_kick(guild_ids)
 if kick_result["success"]:
-print("Kicked Users:")
-for guild_id, kicked_users in kick_result["kicked_users"].items():
-print(f"- Guild ID: {guild_id}, Kicked Users: {kicked_users}")
+   print("Kicked Users:")
+   for guild_id, kicked_users in kick_result["kicked_users"].items():
+       print(f"- Guild ID: {guild_id}, Kicked Users: {kicked_users}")
 else:
-print(f"Failed to kick users: {kick_result['message']}")
+   print(f"Failed to kick users: {kick_result['message']}")
+```
 
 Note:
 This method kicks users from multiple guilds and returns kicked user IDs.
@@ -733,6 +769,7 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Mass modify properties of multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 modifications = {
@@ -742,11 +779,12 @@ modifications = {
 }  # Replace with the properties you want to modify.
 modify_result = await discord_utility.mass_modify_guilds(guild_ids, modifications)
 if modify_result["success"]:
-print("Modified Guilds:")
-for guild_id in modify_result["modified_guilds"]:
-print(f"- Guild ID: {guild_id}")
+   print("Modified Guilds:")
+   for guild_id in modify_result["modified_guilds"]:
+       print(f"- Guild ID: {guild_id}")
 else:
-print(f"Failed to modify guilds: {modify_result['message']}")
+   print(f"Failed to modify guilds: {modify_result['message']}")
+```
 
 Note:
 This method sends HTTP PATCH requests to modify properties of multiple guilds simultaneously.
@@ -774,6 +812,7 @@ Raises:
 AssertionError: If emoji_ids is not a dictionary.
 
 Example Usage:
+```python
 # Mass modify emojis in multiple guilds.
 emoji_ids = {
 123456789012345678: [987654321098765432, 876543210987654321],
@@ -785,11 +824,12 @@ emoji_data = {
 }  # Replace with the desired modifications.
 modify_result = await discord_utility.mass_modify_guilds_emojis(emoji_ids, emoji_data)
 if modify_result["success"]:
-print("Modified Emojis:")
-for guild_id, modified_emoji_ids in modify_result["modified_emojis"].items():
-print(f"- Guild ID: {guild_id}, Modified Emoji IDs: {modified_emoji_ids}")
+   print("Modified Emojis:")
+   for guild_id, modified_emoji_ids in modify_result["modified_emojis"].items():
+       print(f"- Guild ID: {guild_id}, Modified Emoji IDs: {modified_emoji_ids}")
 else:
-print(f"Failed to modify emojis: {modify_result['message']}")
+   print(f"Failed to modify emojis: {modify_result['message']}")
+```
 
 Note:
 This method mass-modifies emojis in multiple guilds and returns modified emoji data.
@@ -807,6 +847,7 @@ Raises:
 AssertionError: If user_ids is not a dictionary.
 
 Example Usage:
+```python
 # Mass modify users in multiple guilds.
 user_ids = {
 123456789012345678: [987654321098765432, 876543210987654321],
@@ -814,11 +855,12 @@ user_ids = {
 }  # Replace with the desired user IDs and data_modify.
 modify_result = await discord_utility.mass_modify_guilds_users(user_ids, data_modify)
 if modify_result["success"]:
-print("Modified Users:")
-for guild_id, modified_users in modify_result["modified_users"].items():
-print(f"- Guild ID: {guild_id}, Modified Users: {modified_users}")
+   print("Modified Users:")
+   for guild_id, modified_users in modify_result["modified_users"].items():
+       print(f"- Guild ID: {guild_id}, Modified Users: {modified_users}")
 else:
-print(f"Failed to modify users: {modify_result['message']}")
+   print(f"Failed to modify users: {modify_result['message']}")
+```
 
 Note:
 This method mass modifies users in multiple guilds.
@@ -864,15 +906,17 @@ Raises:
 AssertionError: If guild_ids is not a list.
 
 Example Usage:
+```python
 # Mass unban users from multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 unban_result = asyncio.run(x.mass_unban(guild_ids))
 if unban_result["success"]:
-print("Unbanned Users:")
-for guild_id, unbanned_users in unban_result["unbanned_users"].items():
-print(f"- Guild ID: {guild_id}, Unbanned Users: {unbanned_users}")
+   print("Unbanned Users:")
+   for guild_id, unbanned_users in unban_result["unbanned_users"].items():
+       print(f"- Guild ID: {guild_id}, Unbanned Users: {unbanned_users}")
 else:
-print(f"Failed to unban users: {unban_result['message']}")
+   print(f"Failed to unban users: {unban_result['message']}")
+```
 
 Note:
 This method unbans users from multiple guilds and returns unbanned user IDs.
@@ -897,6 +941,7 @@ Returns:
 list: A list containing the modified guild IDs.
 
 Example Usage:
+```python
 # Modify properties of a specific guild.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 modifications = {
@@ -906,10 +951,10 @@ modifications = {
 }  # Replace with the properties you want to modify.
 modified_guilds = await discord_utility.modify_guild(session, guild_id, modifications)
 if guild_id in modified_guilds:
-print(f"Modified Guild ID: {guild_id}")
+   print(f"Modified Guild ID: {guild_id}")
 else:
-print(f"Failed to modify guild ID: {guild_id}")
-
+   print(f"Failed to modify guild ID: {guild_id}")
+```
 Note:
 This method sends an HTTP PATCH request to modify properties of a specific guild.
 `modify_guild_emoji(self, session, guild_id, emoji_id, data_modify, modified_emojis={}, total_ratelimits=0)`
@@ -927,6 +972,7 @@ Returns:
 dict: A dictionary containing the result of the operation, including the modified emoji data.
 
 Example Usage:
+```python
 # Modify a guild emoji.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 emoji_id = 987654321098765432  # Replace with the desired emoji ID.
@@ -936,10 +982,11 @@ emoji_data = {
 }  # Replace with the desired modifications.
 modify_result = await discord_utility.modify_guild_emoji(session, guild_id, emoji_id, emoji_data)
 if modify_result["success"]:
-print("Modified Emoji Data:")
-print(modify_result["modified_emoji"])
+   print("Modified Emoji Data:")
+   print(modify_result["modified_emoji"])
 else:
-print(f"Failed to modify emoji: {modify_result['message']}")
+   print(f"Failed to modify emoji: {modify_result['message']}")
+```
 
 Note:
 This method modifies a guild emoji and returns the modified emoji data.
@@ -973,6 +1020,7 @@ Raises:
 AssertionError: If user_ids is not a dictionary.
 
 Example Usage:
+```python
 # Mass-remove roles from members in multiple guilds.
 user_ids = {
 123456789012345678: {"user_ids": [123, 456], "role_ids": [789, 987]},
@@ -981,9 +1029,10 @@ user_ids = {
 result = await discord_utility.mass_remove_guilds_members_roles(user_ids)
 
 if result["success"]:
-print(f"Roles removed from members in multiple guilds")
+   print(f"Roles removed from members in multiple guilds")
 else:
-print(f"Failed to remove roles from members: {result['message']}")
+   print(f"Failed to remove roles from members: {result['message']}")
+```
 
 Note:
 This method removes specified roles from members in multiple guilds and returns the removed member roles.
@@ -1003,6 +1052,7 @@ Returns:
 bool: True if the user was banned successfully, False otherwise.
 
 Example Usage:
+```python
 # Ban a single user from a guild.
 session = aiohttp.ClientSession()
 url = "https://discord.com/api/v10/guilds/123456789012345678/members/987654321098765432"
@@ -1010,10 +1060,10 @@ user_id = 987654321098765432
 banned = await discord_utility.single_ban(session, url, user_id, banned_users, total_ratelimit, timeout=5, guild_id=123456789012345678)
 session.close()
 if banned:
-print(f"Successfully banned user with ID: {user_id}")
+   print(f"Successfully banned user with ID: {user_id}")
 else:
-print(f"Failed to ban user with ID: {user_id}")
-
+   print(f"Failed to ban user with ID: {user_id}")
+```
 Note:
 This method bans a single user from a guild and returns True if successful.
 `single_kick(self, session, url, user_id, kicked_users, total_ratelimit, timeout, guild_id)`
@@ -1032,6 +1082,7 @@ Returns:
 bool: True if the user was kicked successfully, False otherwise.
 
 Example Usage:
+```python
 # Kick a single user from a guild.
 session = aiohttp.ClientSession()
 url = "https://discord.com/api/v10/guilds/123456789012345678/members/987654321098765432"
@@ -1039,10 +1090,10 @@ user_id = 987654321098765432
 kicked = await discord_utility.single_kick(session, url, user_id, kicked_users, total_ratelimit, timeout=5, guild_id=123456789012345678)
 session.close()
 if kicked:
-print(f"Successfully kicked user with ID: {user_id}")
+   print(f"Successfully kicked user with ID: {user_id}")
 else:
-print(f"Failed to kick user with ID: {user_id}")
-
+   print(f"Failed to kick user with ID: {user_id}")
+```
 Note:
 This method kicks a single user from a guild and returns True if successful.
 `single_unban(self, session, url, user_id, unbanned_users, total_ratelimit, timeout, guild_id)`
@@ -1061,6 +1112,7 @@ Returns:
 bool: True if the user was unbanned successfully, False otherwise.
 
 Example Usage:
+```python
 # Unban a single user from a guild.
 session = aiohttp.ClientSession()
 url = "https://discord.com/api/v10/guilds/123456789012345678/bans/987654321098765432"
@@ -1068,10 +1120,10 @@ user_id = 987654321098765432
 unbanned = await x.single_unban(session, url, user_id, unbanned_users, total_ratelimit, timeout=5, guild_id=123456789012345678)
 session.close()
 if unbanned:
-print(f"Successfully unbanned user with ID: {user_id}")
+   print(f"Successfully unbanned user with ID: {user_id}")
 else:
-print(f"Failed to unban user with ID: {user_id}")
-
+   print(f"Failed to unban user with ID: {user_id}")
+```
 Note:
 This method unbans a single user from a guild and returns True if successful.
 `spam_guild_channel(self, session, channel_id, amount, data_message, method='bot', data_webhook={}, spammed_channels=[], total_ratelimits=0)`
@@ -1091,6 +1143,7 @@ Returns:
 list: A list of channel IDs that have been spammed.
 
 Example Usage:
+```python
 # Spam a channel with messages using bot accounts.
 session = aiohttp.ClientSession()
 channel_id = 123456789012345678
@@ -1100,10 +1153,10 @@ method = "bot"
 spammed = await discord_utility.spam_guild_channel(session, channel_id, amount, data_message, method)
 session.close()
 if spammed:
-print(f"Successfully spammed channel ID: {channel_id}")
+   print(f"Successfully spammed channel ID: {channel_id}")
 else:
-print(f"Failed to spam channel ID: {channel_id}")
-
+   print(f"Failed to spam channel ID: {channel_id}")
+```
 Note:
 This method spams a channel with messages using bot accounts or webhooks.
 `spam_guilds_channels(self, channel_ids:�list, amount:�int�=�10, data_message:�dict�=�{'content': '@everyone'}, data_webhook:�dict�=�{'name': ':)'}, method:�str�=�'bot')`
@@ -1120,15 +1173,16 @@ Returns:
 dict: A dictionary containing the result of the operation, including the spammed channels.
 
 Example Usage:
+```python
 # Spam channels in multiple guilds with messages using bot accounts.
 channel_ids = [123456789012345678, 234567890123456789]  # Replace with the desired channel IDs.
 spam_result = await discord_utility.spam_guilds_channels(channel_ids, amount=5)
 if spam_result["success"]:
-print("Spammed Channels:")
-for channel_id in spam_result["spammed_channels"]:
-print(f"- Channel ID: {channel_id}")
+   print("Spammed Channels:")
+   for channel_id in spam_result["spammed_channels"]:
+       print(f"- Channel ID: {channel_id}")
 else:
-print(f"Failed to spam channels: {spam_result['message']}")
-
+   print(f"Failed to spam channels: {spam_result['message']}")
+```
 Note:
 This method spams channels in multiple guilds with messages using bot accounts or webhooks.
