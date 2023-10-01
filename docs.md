@@ -20,17 +20,17 @@ Returns:
 dict: A dictionary containing the result of the operation, including added member roles.
 
 Example Usage:
+```python
 # Add a role to a member in a guild.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 user_id = 987654321098765432  # Replace with the user's ID.
 role_id = 123456789  # Replace with the role ID to be added.
 result = await discord_utility.add_guild_member_role(session, guild_id, user_id, role_id)
-
 if result["success"]:
-print(f"Role with ID {role_id} added to user with ID {user_id} in guild with ID {guild_id}")
+   print(f"Role with ID {role_id} added to user with ID {user_id} in guild with ID {guild_id}")
 else:
-print(f"Failed to add role to user: {result['message']}")
-
+   print(f"Failed to add role to user: {result['message']}")
+```
 Note:
 This method adds a specified role to a member in a guild and returns the added member roles.
 `create_channel_webhook(self, session, channel_id, data_webhook)`
@@ -45,6 +45,7 @@ Returns:
 dict: A dictionary containing information about the created webhook.
 
 Example Usage:
+```python
 # Create a webhook in a channel.
 session = aiohttp.ClientSession()
 channel_id = 123456789012345678
@@ -52,10 +53,10 @@ data_webhook = {"name": "my-webhook"}
 created_webhook = await discord_utility.create_channel_webhook(session, channel_id, data_webhook)
 session.close()
 if created_webhook:
-print(f"Created webhook: {created_webhook['name']} (ID: {created_webhook['id']})")
+   print(f"Created webhook: {created_webhook['name']} (ID: {created_webhook['id']})")
 else:
-print("Failed to create webhook")
-
+   print("Failed to create webhook")
+```
 Note:
 This method creates a webhook in a channel and returns information about the created webhook.
 `create_guild_channel(self, session, guild_id, data, created_channels={}, total_ratelimits=0)`
@@ -72,6 +73,7 @@ Returns:
 dict: A dictionary containing information about the created channel.
 
 Example Usage:
+```python
 # Create a text channel in a guild.
 session = aiohttp.ClientSession()
 guild_id = 123456789012345678
@@ -79,9 +81,10 @@ data = {"name": "my-channel", "type": 0}
 created_channel = await discord_utility.create_guild_channel(session, guild_id, data)
 session.close()
 if created_channel:
-print(f"Created channel: {created_channel['name']} (ID: {created_channel['id']})")
+   print(f"Created channel: {created_channel['name']} (ID: {created_channel['id']})")
 else:
-print("Failed to create channel")
+   print("Failed to create channel")
+```
 
 Note:
 This method creates a channel in a guild and returns information about the created channel.
@@ -105,6 +108,7 @@ Returns:
 dict: A dictionary containing the result of the operation, including created emoji data.
 
 Example Usage:
+```python
 # Create a custom emoji in a guild.
 guild_id = 123456789012345678  # Replace with the desired guild ID.
 emoji_data = {
@@ -113,10 +117,11 @@ emoji_data = {
 }  # Replace with emoji data.
 create_result = await discord_utility.create_guild_emoji(session, guild_id, emoji_data)
 if create_result["success"]:
-print("Created Emoji:")
-print(f"- Guild ID: {guild_id}, Created Emoji: {create_result['created_emoji']}")
+   print("Created Emoji:")
+   print(f"- Guild ID: {guild_id}, Created Emoji: {create_result['created_emoji']}")
 else:
-print(f"Failed to create emoji: {create_result['message']}")
+   print(f"Failed to create emoji: {create_result['message']}")
+```
 
 Note:
 This method creates a custom emoji in a guild and returns the created emoji data.
@@ -134,6 +139,7 @@ Returns:
 dict: A dictionary containing information about the created role.
 
 Example Usage:
+```python
 # Create a role in a guild.
 session = aiohttp.ClientSession()
 guild_id = 123456789012345678
@@ -141,9 +147,10 @@ data_role = {"name": "my-role", "permissions": 0}
 created_role = await discord_utility.create_guild_role(session, guild_id, data_role)
 session.close()
 if created_role:
-print(f"Created role: {created_role['name']} (ID: {created_role['id']})")
+   print(f"Created role: {created_role['name']} (ID: {created_role['id']})")
 else:
-print("Failed to create role")
+   print("Failed to create role")
+```
 
 Note:
 This method creates a role in a guild and returns information about the created role.
@@ -159,6 +166,7 @@ Returns:
 dict: A dictionary containing the result of the operation, including created channels.
 
 Example Usage:
+```python
 # Create text channels in multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 data = {"name": "my-channel", "type": 0}
@@ -166,9 +174,10 @@ create_result = await discord_utility.create_guilds_channels(guild_ids, data)
 if create_result["success"]:
 print("Created Channels:")
 for guild_id, channels in create_result["created_channels"].items():
-print(f"- Guild ID: {guild_id}, Created Channels: {', '.join(channel['name'] for channel in channels)}")
+   print(f"- Guild ID: {guild_id}, Created Channels: {', '.join(channel['name'] for channel in channels)}")
 else:
-print(f"Failed to create channels: {create_result['message']}")
+   print(f"Failed to create channels: {create_result['message']}")
+```
 
 Note:
 This method creates channels in multiple guilds and returns information about the created channels.
@@ -184,6 +193,7 @@ Returns:
 dict: A dictionary containing the result of the operation, including created roles.
 
 Example Usage:
+```python
 # Create roles in multiple guilds.
 guild_ids = [123456789012345678, 234567890123456789]  # Replace with the desired guild IDs.
 data_role = {"name": "my-role", "permissions": 0}
@@ -191,9 +201,10 @@ create_result = await discord_utility.create_guilds_roles(guild_ids, data_role)
 if create_result["success"]:
 print("Created Roles:")
 for guild_id, roles in create_result["created_roles"].items():
-print(f"- Guild ID: {guild_id}, Created Roles: {', '.join(role['name'] for role in roles)}")
+   print(f"- Guild ID: {guild_id}, Created Roles: {', '.join(role['name'] for role in roles)}")
 else:
-print(f"Failed to create roles: {create_result['message']}")
+   print(f"Failed to create roles: {create_result['message']}")
+```
 
 Note:
 This method creates roles in multiple guilds and returns information about the created roles.
