@@ -964,7 +964,7 @@ class supolo:
                 else:
                     break
             else:
-                break
+                return spammed_channels
         return spammed_channels
     
     async def create_channel_webhook(self, session, channel_id, data_webhook):
