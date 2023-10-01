@@ -22,6 +22,13 @@ Here's an example of a response you might get when using **supolo**:
 {'success': True, 'time_taken': 0.24078199997893535, 'total_ratelimits': 0, 'info': {}}
 ```
 
+### docs
+
+if you need help with any function and a example with it use 
+```python
+help(function))
+```
+
 ### Important Note
 
 When performing larger tasks like mass kicks or bans, it is suggested to leave `skipOnRatelimit` set to `false`. Discord endpoints may rate limit fast but for a short time. You can modify the `ratelimitCooldown` parameter in seconds (can also be set to 0, but it's not recommended).
