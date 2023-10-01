@@ -1,4 +1,4 @@
-Module __init__
+Module Supolo
 ===============
 Classes
 -------
