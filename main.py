@@ -168,3 +168,21 @@ print(added_member_roles)
 # need aiohttp session
 added_member_role = asyncio.run(x.remove_guild_member_role(session, guild_id=123, user_id=123, role_id=123))
 print(added_member_role)
+
+# modify guilds roles positions
+modified_guilds_roles_positions = asyncio.run(x.modify_guilds_roles_position(guild_ids=[1141399067142926386], data_role={}))
+print(modified_guilds_roles_positions)
+
+# modify guild role position
+# need aiohttp session
+modified_guild_role_position = asyncio.run(x.modify_guild_role_position(session, guild_id=1141399067142926386, data_role={}))
+print(modified_guild_role_position)
+
+# modify guilds roles
+modified_guilds_roles = asyncio.run(x.modify_guilds_roles(guild_ids=[1141399067142926386], data_role={}))
+print(modified_guilds_roles)
+
+# modify guild role
+# need aiohttp session
+modified_guild_role = asyncio.run(x.modify_guild_role(session, guild_id=1141399067142926386, data_role={}))
+print(modified_guild_role)
